@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use BotMan\BotMan\BotMan;
 use Illuminate\Http\Request;
 use App\Conversations\ExampleConversation;
+use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
 
 class BotManController extends Controller
 {
@@ -34,4 +35,11 @@ class BotManController extends Controller
     {
         $bot->startConversation(new ExampleConversation());
     }
+
+    public function Welcome($bot){
+        $name = $bot->getUser()->getFirstName(); 
+       
+    }
+
+        
 }
