@@ -17,15 +17,20 @@ class WelcomeConversation extends Conversation
      * @return mixed
      */
     protected $url;
+    protected $help;
+
+    public function __construct(){
+        $this->help = new \Helpers;
+    }
 
      public function Welcome(){
 
         $this->url = env('API');
-        $name = $this->bot->getUser()->getFirstName();
-        $message = 'Hello *'.$name.'!* 
-        Welcome to B School Management system bot.';
-        $this->say($message,['parse_mode'=>'Markdown']);
-        $this->GetCode(); 
+        $info = $this->bot->getUser();
+        $name = $info->getFirstName();
+        $message = 'Hello <b>'.$name.'!</b> \n Welcome to B School Management system bot.';
+        $this->say($message,['parse_mode'=>'HTML']);
+        $this->GetCode();  
     }
 
     public function GetCode() {
@@ -93,6 +98,7 @@ class WelcomeConversation extends Conversation
             $buser = Botusers::where("chatid", $chatID)->first();
             $buser->findOrFail($buser->id);
             $buser->pwd = $pwd;
+            $buser->updated_at = date('Y-m-d H:i:s');
             $buser->save();
             //retrieve save user info for authentication
             $data  = Botusers::where("chatid",$chatID)->first();
@@ -124,10 +130,10 @@ class WelcomeConversation extends Conversation
                     $buser->uname = $data["name"];
                     $buser->save();
 
-                    $help = new \Helpers;
+                    
 
                     $message = "Welcome <b>{$data['name']}</b>. What do you want to do today?";
-                    $help->SendMenu($chatID,$message);
+                    $this->help->MainMenu($chatID,$message);
                     return;
                 }
                 
@@ -138,6 +144,17 @@ class WelcomeConversation extends Conversation
 
     public function run()
     {
-        $this->Welcome();
+        $info = $this->bot->getUser();
+        if($this->help->IsLoggedIn($info->getId())){
+            $message = "Welcome <b>".\Helpers::$UserInfo->uname."</b>. What do you want to do today?";
+            $this->help->MainMenu($info->getId(),$message);
+            return;
+
+        }else{
+
+            $message = "You were logged out due to inactivity,press the login button to continue";
+            $this->help->Login($info->getId(),$message);
+            return;
+        }
     }
 }

@@ -1,7 +1,11 @@
 <?php
+use App\Conversations\ProfileConversation;
+use App\Conversations\SearchConversation;
 use App\Conversations\WelcomeConversation;
 use App\Http\Controllers\BotManController;
 use App\Helpers;
+use BotMan\BotMan\Messages\Attachments\Image;
+use BotMan\BotMan\Messages\Outgoing\OutgoingMessage;
 use BotMan\BotMan\Messages\Outgoing\Question;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use GuzzleHttp\Client;
@@ -12,82 +16,22 @@ $botman->hears('/start', function ($bot) {
     $bot->startConversation(new WelcomeConversation());
 });
 
-$botman->hears('menu', function ($bot) {
-
- $jayParsedAry = [
-    "reply_markup"=>[
-            "keyboard" => [
-                    [
-                        [
-                        "text" => "Add User", 
-                        "request_contact" => false, 
-                        "request_location" => false 
-                        ], 
-                        [
-                            "text" => "Disable User", 
-                            "request_contact" => false, 
-                            "request_location" => false 
-                        ] 
-                    ], 
-                    [
-                                [
-                                    "text" => "Key", 
-                                    "request_contact" => false, 
-                                    "request_location" => false 
-                                ], 
-                                [
-                                    "text" => "Invoice", 
-                                    "request_contact" => false, 
-                                    "request_location" => false 
-                                    ] 
-                            ], 
-                    [
-                                        [
-                                            "text" => "Receipt", 
-                                            "request_contact" => false, 
-                                            "request_location" => false 
-                                        ], 
-                                        [
-                                                "text" => "Internet", 
-                                                "request_contact" => false, 
-                                                "request_location" => false 
-                                            ] 
-                                    ], 
-                    [
-                                                [
-                                                    "text" => "Make Payment", 
-                                                    "request_contact" => false, 
-                                                    "request_location" => false 
-                                                ] 
-                                                ] 
-                ], 
-            "one_time_keyboard" => true, 
-            "resize_keyboard" => true, 
-            "selective" => true
-            ],
-            "text"=>"Message",
-            "parse_mode"=>"HTML"
-];
-
-    $url = "https://api.telegram.org/bot" . env('TELEGRAM_TOKEN')."/sendMessage?chat_id=".$bot->getUser()->getId();
-    $client = new Client();
-    $client->post($url, ['json' => $jayParsedAry]);
-    $bot->reply($url);
-
-    // $quiz = Question::create("What animal person are you?")
-    // ->addButtons([
-    //         Button::create("I like cats")->value('cat')->additionalParameters(["resize_keyboard" => true])
-    //     ]
-    // );
-
-
-    // $bot->ask($quiz,function($answer){
-
-    //  });
+$botman->hears('search student', function ($bot) {
+    $bot->startConversation(new SearchConversation());
 });
 
-$botman->hears('Profile', function ($bot) {
+// $botman->hears('profile', function ($bot) {
+//     $bot->startConversation(new ProfileConversation());
+// });
 
-    $bot->reply("profile selected");
+$botman->hears('test', function ($bot) {
 
+    $message = OutgoingMessage::create("TestImage")->withAttachment(
+
+        new Image('http://73f3-102-219-210-77.ngrok-free.app/passports/64dde394332e9.jpg')
+    );
+    $bot->reply($message );
 });
+
+
+
